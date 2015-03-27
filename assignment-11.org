@@ -150,3 +150,40 @@
         \end{aligned}
       \end{equation*}
     #+END_SRC
+
+*** Answer 3
+    Using a slightly altered formula for the median, we can calculate the 82'nd
+    percentile.  It is easy to see that the 82'nd percentile falls in the third
+    group, viz. [75, 85) interval.  Assuming values are uniformly distribute
+    in this interval, ${7 \over 10}$ of these are below 82 and ${3 \over 10}$
+    are above.  In other words, we need to take 0.3 of the 45 students in this
+    category, i.e. 13.5, together with 15 students who earned more points this
+    gives roughly 19 students.
+
+*** Answer 4
+    New average is just the weighted average of both averages:
+    $\frac{70*80+72.5*120}{80+120}=71.5$.
+
+    The total variance is calculated using
+    #+HEADER: :exports results
+    #+HEADER: :results (by-backend (pdf "latex") (t "raw"))
+    #+BEGIN_SRC latex
+      \begin{equation*}
+        \begin{aligned}
+          s_1 &= n(S_1 + \overline{x}^2_1) \\
+          s_1 &= 120 * (175 + 72.5^2) \\
+          s_1 &= 651750. \\
+          s_2 &= n(S_2 + \overline{x}^2_2) \\
+          s_2 &= 80 * (200 + 70^2) \\
+          s_2 &= 408000.
+        \end{aligned}
+      \end{equation*}
+      \begin{equation*}
+        \begin{aligned}
+          S^2 &= \frac{s_1 + s_2}{n_1 + n_2} - \overline{x}^2 \\
+          S^2 &= \frac{651750 + 408000}{200} - 71.5^2 \\
+          S^2 &= \frac{651750 + 408000}{200} - 5112.25 \\
+          S^2 &= 186.5
+        \end{aligned}
+      \end{equation*}
+    #+END_SRC
