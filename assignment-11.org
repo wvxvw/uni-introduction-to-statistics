@@ -1,0 +1,152 @@
+# -*- fill-column: 80; org-confirm-babel-evaluate: nil -*-
+
+#+TITLE:     Assignment 11, Introduction to Statistics
+#+AUTHOR:    Oleg Sivokon
+#+EMAIL:     olegsivokon@gmail.com
+#+DATE:      <2015-03-27 Fri>
+#+DESCRIPTION: First asssignment in the course Introduction to Statistics
+#+KEYWORDS: Discrete Mathematics, assignment, bar chart, histogram
+#+LANGUAGE: en
+#+LaTeX_CLASS: article
+#+LATEX_HEADER: \usepackage[usenames,dvipsnames]{color}
+#+LATEX_HEADER: \usepackage[backend=bibtex, style=numeric]{biblatex}
+#+LATEX_HEADER: \usepackage{commath}
+#+LATEX_HEADER: \usepackage{tikz}
+#+LATEX_HEADER: \usetikzlibrary{shapes,backgrounds}
+#+LATEX_HEADER: \usepackage{marginnote}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER: \usepackage{enumerate}
+#+LATEX_HEADER: \hypersetup{urlcolor=blue}
+#+LATEX_HEADER: \hypersetup{colorlinks,urlcolor=blue}
+#+LATEX_HEADER: \addbibresource{bibliography.bib}
+#+LATEX_HEADER: \setlength{\parskip}{16pt plus 2pt minus 2pt}
+#+LATEX_HEADER: \definecolor{codebg}{rgb}{0.96,0.99,0.8}
+#+LATEX_HEADER: \definecolor{codestr}{rgb}{0.46,0.09,0.2}
+
+#+BEGIN_SRC emacs-lisp :exports none
+(setq org-latex-pdf-process
+        '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -bibtex -f %f")
+        org-latex-listings t
+        org-src-fontify-natively t
+        org-babel-latex-htlatex "htlatex")
+(defmacro by-backend (&rest body)
+    `(cl-case (when (boundp 'backend) (org-export-backend-name backend))
+       ,@body))
+#+END_SRC
+
+#+RESULTS:
+: by-backend
+
+#+BEGIN_LATEX
+  \lstset{ %
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+    breaklines=false,
+    captionpos=b,                    % sets the caption-position to bottom
+    commentstyle=\color{mygreen},    % comment style
+    framexleftmargin=10pt,
+    xleftmargin=10pt,
+    framerule=0pt,
+    frame=tb,                        % adds a frame around the code
+    keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+    keywordstyle=\color{blue},       % keyword style
+    showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+    showstringspaces=false,          % underline spaces within strings only
+    showtabs=false,                  % show tabs within strings adding particular underscores
+    stringstyle=\color{codestr},     % string literal style
+    tabsize=2,                       % sets default tabsize to 2 spaces
+  }
+#+END_LATEX
+
+\clearpage
+
+* Problems
+
+** Problem 1
+   Given the grades in an engineering faculty were as follows:
+
+   #+NAME: students
+   | lower | higher | graded |
+   |-------+--------+--------|
+   |    30 |     60 |     15 |
+   |    60 |     75 |     45 |
+   |    75 |     85 |     45 |
+   |    85 |    100 |     15 |
+
+   1. Present the data using a histogram.
+   2. Calculate mode, median, algebraic average and variance.
+   3. Calculate the number of students who earned at least 82 points.
+   4. Given the following data for the preceding year for 80 students
+      where the average grade was 70 and variance was 200, find the
+      average and the variance for two years combined.
+
+*** Answer 1
+
+    #+NAME: students-histogram
+    #+HEADER: :file images/students.pdf :width 10 :height 10
+    #+HEADER: :exports both
+    #+BEGIN_SRC R :results output graphics :var tbl=students
+      library(ggplot2)
+      tbl$avg <- (tbl$lower + tbl$higher) / 2
+      ggplot(tbl) + 
+          geom_histogram(
+              aes(x = avg, weight = graded, fill = ..count..), 
+              breaks = unique(append(tbl$lower, tbl$higher)),
+              position = "identity", colour = "black") +
+                  xlab("grades")
+      
+    #+END_SRC
+
+    #+RESULTS: students-histogram
+    [[file:images/students.pdf]]
+
+*** Answer 2
+    As easy to see from the diagram, there are two *modes*: one is in the
+    (60, 75] range, an another is in the (75, 85] range.
+    
+    The *median* is the value at the 60'th studen, which is easy to see
+    from the table as being the 75 points.
+    #+HEADER: :exports results
+    #+HEADER: :results (by-backend (pdf "latex") (t "raw"))
+    #+BEGIN_SRC latex
+      \begin{equation*}
+        \begin{aligned}
+          Md &= \frac{\frac{n}{2} - F(x_{m-1})}{f(x_m)} * (L_1-L_0)+L_0 \\
+          Md &= \frac{\frac{120}{2} - 60}{45} * (85 - 75) + 75 \\
+          Md &= \frac{60 - 60}{45} * (85 - 75) + 75 \\
+          Md &= 75
+        \end{aligned}
+      \end{equation*}
+    #+END_SRC
+
+    The *average* is given by the formula:
+    #+HEADER: :exports results
+    #+HEADER: :results (by-backend (pdf "latex") (t "raw"))
+    #+BEGIN_SRC latex
+      \begin{equation*}
+        \begin{aligned}
+          \frac{15 * \frac{30 + 60}{2} + 45 * \frac{60 + 75}{2} +
+            45 * \frac{75 + 85}{2} + 15 * \frac{85 + 100}{2}}{15 + 45 + 45 + 15} = \\
+          \frac{15 * 90 + 45 * 135 + 45 * 160 + 15 * 185}{2 * 120} = \\
+          \frac{17400}{240} = \\72.5
+        \end{aligned}
+      \end{equation*}
+    #+END_SRC
+
+    And the *variance*:
+    #+HEADER: :exports results
+    #+HEADER: :results (by-backend (pdf "latex") (t "raw"))
+    #+BEGIN_SRC latex
+      \begin{equation*}
+        \begin{aligned}
+          S^2 &= \frac{\sum_1^n (x - \overline{x})^2 * f(x)}{n} \\
+          S^2 &= \frac{(45 - 72.5)^2 * 15 + (67.5 - 72.5)^2 * 45 +
+            (80 - 72.5)^2 * 45 + (92.5 - 72.5)^2 * 15}{120} \\
+          S^2 &= \frac{756.25 * 15 + 25 * 45 + 56.25 * 45 + 400 * 15}{120} \\
+          S^2 &= \frac{21000}{120} \\
+          S^2 &= 175
+        \end{aligned}
+      \end{equation*}
+    #+END_SRC
