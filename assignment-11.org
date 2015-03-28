@@ -100,7 +100,7 @@
     #+END_SRC
 
     #+RESULTS: students-histogram
-    [[file:images/students.pdf]]
+    [[file:images/assignments.pdf]]
 
 *** Answer 2
     As easy to see from the diagram, there are two *modes*: one is in the
@@ -187,3 +187,102 @@
         \end{aligned}
       \end{equation*}
     #+END_SRC
+
+** Problem 2
+   Given the number of assignments submitted in 2009 (shown below):
+
+   #+NAME: assignments
+   | assignments | students |
+   |-------------+----------|
+   |           0 |       11 |
+   |           1 |       18 |
+   |           2 |       28 |
+   |           3 |       22 |
+   |           4 |       15 |
+   |           5 |       16 |
+
+   1. Draw a bar chart representing the data.
+   2. Find mode, median, algebraic average and variance.
+   3. In addition to the number of assignments submitted, students
+      also received final grades.  Let $X$ be the number of assignments
+      submitted, let $Y$ be the grade the student received.  Given also that
+      Pearson coefficient is $r=0.75$.
+      
+      *Prove or disprove:*
+      1. $Y = 0.75X + 96.25$.
+      2. The number of assignments submitted negatively correlates with
+         the final grade they received.
+         
+   4. An investigation found data on 10 more students.  5 of them didn't
+      submit any assignment and 5 of them submitted 5 assignments each.
+      Describe what will happen to each metric calculated in question 2 relying
+      on the previously obtained values.
+
+*** Answer 5
+    #+NAME: assignments-histogram
+    #+HEADER: :file images/assignments.pdf :width 10 :height 10
+    #+HEADER: :exports both
+    #+BEGIN_SRC R :results output graphics :var tbl=assignments
+      library(ggplot2)
+      ggplot(data = tbl, 
+             aes(x = assignments, y = students, fill = assignments)) +
+                 geom_bar(colour = "black", stat = "identity")
+    #+END_SRC
+
+    #+RESULTS: assignments-histogram
+    [[file:images/assignments.pdf]]
+
+*** Answer 6
+    *Mode* for the assignments data is 2, i.e. most of the students submitted
+    only two assignments.
+
+    *Median* is $2+(3-2)/2=2.5$ (because there is an even number of bins).
+
+    Weighted *average* can be obtained using
+    $\frac{0*11+1*18+2*28+3*22+4*15+5*16}{110}=\frac{280}{110}=2.45(45)$.
+
+    *Variance* can be obtained using:
+    #+HEADER: :exports results
+    #+HEADER: :results (by-backend (pdf "latex") (t "raw"))
+    #+BEGIN_SRC latex
+      \begin{equation*}
+        \begin{aligned}
+          S^2 &= \frac{(0 * 11)^2 + (1 * 18)^2 + (2 * 28)^2 +
+            (3 * 22)^2 + (4 * 15)^2 + (5 * 16)^2}{110} - 2.45^2 \\
+          S^2 &= \frac{17816}{110} - 6.0025 \\
+          S^2 &= 161.963636364 \\
+          S^2 &\simeq 162
+        \end{aligned}
+      \end{equation*}
+    #+END_SRC
+    
+*** Answer 7
+    While it seems appealing, it isn't really possible to have a determination
+    coefficient predict the value of another variable with absolute certainity
+    unless the coefficient is equal to one.  Thus $Y = 0.75X + 96.25$ is at best
+    a lucky coincidence.
+
+    Positive coefficient means that there exists positive correlation between
+    two variables.  In particular, it means that roughly in three fourth of all
+    cases the number of assignments submited perfectly predicted the final grade.
+    So the claim is obviously false.
+
+*** Answer 8
+    After adding ten more observations the *mode* will not change as the
+    observations fall into the bins which aren't as dense as the most dense one,
+    i.e. the first bin will contain 11+5=16 students
+    /(fewer than 28 of the densest bin)/ and 6+5=11 in the last bin.
+
+    The *median* will not change either because we are adding observations to
+    the outermost bins in an equal measure.
+
+    The *average* will almost not change because the added observations will
+    ``cancel out'', however, it will shift very slightly towards the upper
+    end, since we increased the relative weight of the bin of those who
+    submitted the most assignments.
+
+    Since *variance* is affected by the mean, it is hard to tell without
+    doing full recalculation whether it will or will not change.  However,
+    since we added more borderline observations, which are most likely to
+    be far away from the mean, we'd expect the variance to grow.
+    
