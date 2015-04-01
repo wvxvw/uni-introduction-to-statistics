@@ -1,4 +1,4 @@
-% Created 2015-03-28 Sat 20:18
+% Created 2015-04-01 Wed 21:10
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -20,8 +20,7 @@
 \usepackage[usenames,dvipsnames]{color}
 \usepackage[backend=bibtex, style=numeric]{biblatex}
 \usepackage{commath}
-\usepackage{tikz}
-\usetikzlibrary{shapes,backgrounds}
+\usepackage{mathtools}
 \usepackage{marginnote}
 \usepackage{listings}
 \usepackage{color}
@@ -101,9 +100,10 @@ average and the variance for two years combined.
 \begin{lstlisting}
 library(ggplot2)
 tbl$avg <- (tbl$lower + tbl$higher) / 2
+tbl$density <- 10 * tbl$graded / (tbl$higher - tbl$lower)
 ggplot(tbl) + 
     geom_histogram(
-        aes(x = avg, weight = graded, fill = ..count..), 
+        aes(x = avg, weight = density, fill = ..count..), 
         breaks = unique(append(tbl$lower, tbl$higher)),
         position = "identity", colour = "black") +
             xlab("grades")
@@ -112,8 +112,7 @@ ggplot(tbl) +
 \includegraphics[width=.9\linewidth]{images/students.pdf}
 \subsubsection{Answer 2}
 \label{sec-1-1-2}
-As easy to see from the diagram, there are two \textbf{modes}: one is in the
-(60, 75] range, an another is in the (75, 85] range.
+As easy to see from the diagram, the \textbf{mode} is in the (75, 85] range.
 
 The \textbf{median} is the value at the 60'th studen, which is easy to see
 from the table as being the 75 points.
@@ -140,8 +139,8 @@ And the \textbf{variance}:
 \begin{equation*}
   \begin{aligned}
     S^2 &= \frac{\sum_1^n (x - \overline{x})^2 * f(x)}{n} \\
-    S^2 &= \frac{(45 - 72.5)^2 * 15 + (67.5 - 72.5)^2 * 45 +
-      (80 - 72.5)^2 * 45 + (92.5 - 72.5)^2 * 15}{120} \\
+    S^2 &= \frac{\splitfrac{(45 - 72.5)^2 * 15 + (67.5 - 72.5)^2 * 45}
+      {+ (80 - 72.5)^2 * 45 + (92.5 - 72.5)^2 * 15}}{120} \\
     S^2 &= \frac{756.25 * 15 + 25 * 45 + 56.25 * 45 + 400 * 15}{120} \\
     S^2 &= \frac{21000}{120} \\
     S^2 &= 175
@@ -346,8 +345,8 @@ The \textbf{standard deviation} can be obtained via:
 \begin{equation*}
   \begin{aligned}
     \sigma &= \sqrt{\frac{\sum_{i=1}^n (x-\overline{x})^2}{n}} \\
-    \sigma &= \sqrt{\frac{15 * (15 - 65)^2 + 30 * (45 - 65)^2 +
-        40 * (65 - 65)^2 + 60 * (80 - 65)^2 + 15 * (95 - 65)^2}{160}} \\
+    \sigma &= \sqrt{\frac{\splitfrac{15 * (15 - 65)^2 + 30 * (45 - 65)^2}
+        {+ 40 * (65 - 65)^2 + 60 * (80 - 65)^2 + 15 * (95 - 65)^2}}{160}} \\
     \sigma &= \sqrt{\frac{76500}{160}} \\
     \sigma &= 21.8660696057.
   \end{aligned}
@@ -405,8 +404,8 @@ assume that the margins of the distribution narrowed, but it doesn't
 hurt to calculate it, which gives:
 \begin{equation*}
   \begin{aligned}
-    \sigma &= \sqrt{\frac{10 * (15 - 73.75)^2 + 25 * (45 - 73.75)^2 +
-        10 * (65 - 73.75)^2 + 70 * (80 - 73.75)^2 + 45 * (95 - 73.75)^2}{160}} \\
+    \sigma &= \sqrt{\frac{\splitfrac{10 * (15 - 73.75)^2 + 25 * (45 - 73.75)^2}
+          {+ 10 * (65 - 73.75)^2 + 70 * (80 - 73.75)^2 + 45 * (95 - 73.75)^2}}{160}} \\
     \sigma &= \sqrt{\frac{79000}{160}} \\
     \sigma &= 22.2204860433.
   \end{aligned}
@@ -414,5 +413,86 @@ hurt to calculate it, which gives:
 
 Which is proves our initial assumption to be wrong, indeed the standard
 deviation grew as a result of this change.
+\subsection{Problem 4}
+\label{sec-1-4}
+Given the table of overdue assignments:
+
+\begin{center}
+\begin{tabular}{rr}
+days & students\\
+\hline
+0 & 18\\
+1 & 10\\
+2 & 4\\
+3 & 5\\
+4 & 2\\
+5 & 1\\
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+\item Present the data using a bar chart.
+\item Find mode, median, average and variance.
+\item The professor decided to deduce 5 points for each day past the submission
+deadline.  Provided the students could've been awarded at most 100 points
+before deduction, calculate the maximum average and maximum variance after
+deduction.
+\item The professor forgot to add five more records of students who submitted
+their assignments even later than the rest.  After these data are added,
+what will happen to the statistics calculated in (2)?
+\end{enumerate}
+
+\subsubsection{Answer 13}
+\label{sec-1-4-1}
+\lstset{language=R,label=overdue-barchart,numbers=none}
+\begin{lstlisting}
+library(ggplot2)
+ggplot(data = tbl, 
+       aes(x = days, y = students, fill = days)) +
+           geom_bar(colour = "black", stat = "identity")
+\end{lstlisting}
+
+\includegraphics[width=.9\linewidth]{images/overdue.pdf}
+\subsubsection{Answer 14}
+\label{sec-1-4-2}
+As is easy to see from the diagram, the \textbf{mode} is 0 (i.e. most students
+submitted their assignments on time).
+
+The \textbf{median} is is betwen the 20'th and the 21'st students (since there are
+in total 40 observations), and it is 1.
+
+The \textbf{average} is $\frac{18*0+10*1+4*3+5*3+2*4+1*5}{40}=1.25$.
+
+The \textbf{variance} is thus:
+\begin{equation*}
+  \frac{\splitfrac{(18 * (0 - 1.25)^2 + 10 * (1 - 1.25)^2 + 4 * (3 - 1.25)^2}
+    {+ 5 * (3 - 1.25)^2 + 2 * (4 - 1.25)^2 + 1 * (5 - 1.25)^2}}{40} = 2.1375.
+\end{equation*}
+\subsubsection{Answer 15}
+\label{sec-1-4-3}
+It is easy to calculate the points deduced as a weighted sum of days, weighted
+by students, i.e. $5*(0*18+1*10+2*4+3*5+4*2+3*1)=220$, while total number of
+points before deduction is $40*100=4000$, thus $\frac{4000-220}{40}=94.5$
+would be the \textbf{average} after deduction.
+
+Using the average, we can now find \textbf{variance} 
+
+\begin{equation*}
+  \begin{aligned}
+    \frac{\splitfrac{18 * (0 * 100)^2 + 1 * (10 * 95)^2 + 2 * (4 * 90)^2}
+      {+ 3 * (5 * 85)^2 + 4 * (2 * 80)^2 + 3 * (1 * 75)^2}}{40} - 94.5^2 = \\
+    \frac{1822850}{40} - 8930.25 = 36641.
+  \end{aligned}
+\end{equation*}
+\subsubsection{Answer 16}
+\label{sec-1-4-4}
+After more observations are added, the \textbf{mode} will not change (it will still
+be the most common case that the most students submitted their assignments on
+time).  The \textbf{median} will not change either, however now the median student
+will be the 23'rd one, but that student is still the one who submitted the
+assignment one day overdue.  The average will slightly increase (since we
+added more students who are in a category far away from the old average).
+Finally, the variance will likely increase too, since we are adding observations
+which are far away from the average.
 % Emacs 25.0.50.1 (Org mode 8.2.2)
 \end{document}
