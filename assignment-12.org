@@ -1,0 +1,153 @@
+# -*- fill-column: 80; org-confirm-babel-evaluate: nil -*-
+
+#+TITLE:     Assignment 12, Introduction to Statistics
+#+AUTHOR:    Oleg Sivokon
+#+EMAIL:     olegsivokon@gmail.com
+#+DATE:      <2015-03-27 Fri>
+#+DESCRIPTION: Second asssignment in the course Introduction to Statistics
+#+KEYWORDS: Probabilities, assignment
+#+LANGUAGE: en
+#+LaTeX_CLASS: article
+#+LATEX_HEADER: \usepackage[usenames,dvipsnames]{color}
+#+LATEX_HEADER: \usepackage[backend=bibtex, style=numeric]{biblatex}
+#+LATEX_HEADER: \usepackage{commath}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{marginnote}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER: \usepackage{enumerate}
+#+LATEX_HEADER: \hypersetup{urlcolor=blue}
+#+LATEX_HEADER: \hypersetup{colorlinks,urlcolor=blue}
+#+LATEX_HEADER: \addbibresource{bibliography.bib}
+#+LATEX_HEADER: \setlength{\parskip}{16pt plus 2pt minus 2pt}
+#+LATEX_HEADER: \definecolor{codebg}{rgb}{0.96,0.99,0.8}
+#+LATEX_HEADER: \definecolor{codestr}{rgb}{0.46,0.09,0.2}
+
+#+BEGIN_SRC emacs-lisp :exports none
+(setq org-latex-pdf-process
+        '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -bibtex -f %f")
+        org-latex-listings t
+        org-src-fontify-natively t
+        org-babel-latex-htlatex "htlatex")
+(defmacro by-backend (&rest body)
+    `(cl-case (when (boundp 'backend) (org-export-backend-name backend))
+       ,@body))
+#+END_SRC
+
+#+RESULTS:
+: by-backend
+
+#+BEGIN_LATEX
+  \lstset{ %
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+    breaklines=false,
+    captionpos=b,                    % sets the caption-position to bottom
+    framexleftmargin=10pt,
+    xleftmargin=10pt,
+    framerule=0pt,
+    frame=tb,                        % adds a frame around the code
+    keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+    keywordstyle=\color{blue},       % keyword style
+    showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+    showstringspaces=false,          % underline spaces within strings only
+    showtabs=false,                  % show tabs within strings adding particular underscores
+    stringstyle=\color{codestr},     % string literal style
+    tabsize=2,                       % sets default tabsize to 2 spaces
+  }
+#+END_LATEX
+
+\clearpage
+
+* Problems
+
+** Problem 1
+   Given the lottery ticket can have six numbers chosen from 1 through 6.
+   Each play selects a six digits number and the players are awarded according
+   to the number of digits they guessed.
+
+   1. What is the chance of guessing all numbers?
+   2. What is the chance of guessing exactly three of all numbers?
+   3. What is the chance of the winning number to be a palindrome?
+
+*** Answer 1
+    The chance of guessing all numbers can be calculated as a product of
+    probabilities of guessing each number independently. Probability of
+    guessing one number is one in six, thus the total probability of
+    guessing the number is $\frac{1}{6^6} = 0.00002143347$.
+
+*** Answer 2
+    The probability of guessing exactly three numbers is the probability
+    of guessing three numbers times the probability of guessing other three
+    not winning numbers, as many times as we can choose combinations of three
+    out of six, i.e.:
+    $\binom{6}{3} \times \frac{1}{6^3} \times \frac{5^3}{6^3} = 0.053583678$.
+
+*** Answer 3
+    The probability of a six-digit number being a palindrome is the product
+    of first and last numbers being the same, second and fifth being the same
+    and third and fourth being the same.  Observe now that the condition of
+    being the same is equivalent to requiring that one of the numbers of the
+    pair be exactly of the six possible results, hence the probability of
+    two given numbers matching is exactly $\frac{1}{6}$, thus total probability
+    is $\frac{1}{6^3} = 0.0046296297$.
+
+    Here's the calculation that verifies the results:
+
+    #+BEGIN_SRC lisp :results output :exports both
+      (defun generate-ticket ()
+        (loop :repeat 6 :collect (random 6)))
+      
+      (defun exactly-3-match (a b)
+        (= 3 (loop :for i :in a :for j :in b
+                :when (= i j) :count 1)))
+      
+      (defun palindromep (tested) (equal tested (reverse tested)))
+      
+      (defun num->ticket (n)
+        (nreverse
+         (loop :repeat 6 :collect (mod n 6) :do (setf n (floor n 6)))))
+      
+      (defun ticket->num (ticket)
+        (reduce (lambda (a b) (+ (* 6 a) b)) ticket :initial-value 0))
+      
+      (defun next-ticket (previous)
+        (num->ticket (1+ (ticket->num previous))))
+      
+      (defparameter *all-tickets* (expt 6 6))
+      
+      (defun chance-of-winning ()
+        (/ (loop :with ticket := (generate-ticket)
+              :repeat *all-tickets*
+              :for attempt := '(0 0 0 0 0 0) :then (next-ticket attempt)
+              :when (equal attempt ticket) :count 1)
+           ,*all-tickets*))
+      
+      (defun chance-of-three-matching ()
+        (/ (loop :with ticket := (generate-ticket)
+              :repeat *all-tickets*
+              :for attempt := '(0 0 0 0 0 0) :then (next-ticket attempt)
+              :when (exactly-3-match ticket attempt) :count 1)
+           ,*all-tickets*))
+      
+      (defun chance-of-palindrome ()
+        (/ (loop :repeat *all-tickets*
+              :for attempt := '(0 0 0 0 0 0) :then (next-ticket attempt)
+              :when (palindromep attempt) :count 1)
+           ,*all-tickets*))
+      
+      (format t "~&Chance of winning the lotery:     ~f~%~
+                   Chance of guessing exactly three: ~f~%~
+                   Chance of palindrome ticket:      ~f"
+              (chance-of-winning)
+              (chance-of-three-matching)
+              (chance-of-palindrome))
+      
+    #+END_SRC
+
+    #+RESULTS:
+    : Chance of winning the lotery:     0.00002143347
+    : Chance of guessing exactly three: 0.053583678
+    : Chance of palindrome ticket:      0.0046296297
+

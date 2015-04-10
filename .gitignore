@@ -7,3 +7,8 @@
 *.run.xml
 /.directory
 /helpers/.directory
+/assignment-11.doc
+*.zip
+/bogus.html
+/bogus1.html
+/submit.sh
