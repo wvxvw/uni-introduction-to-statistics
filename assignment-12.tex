@@ -1,4 +1,4 @@
-% Created 2015-04-10 Fri 22:43
+% Created 2015-04-11 Sat 20:56
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -19,6 +19,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[usenames,dvipsnames]{color}
 \usepackage[backend=bibtex, style=numeric]{biblatex}
+\usepackage[scientific-notation=true]{siunitx}
 \usepackage{commath}
 \usepackage{mathtools}
 \usepackage{marginnote}
@@ -85,14 +86,14 @@ to the number of digits they guessed.
 The chance of guessing all numbers can be calculated as a product of
 probabilities of guessing each number independently. Probability of
 guessing one number is one in six, thus the total probability of
-guessing the number is $\frac{1}{6^6} = 0.00002143347$.
+guessing the number is $\frac{1}{6^6} = \num{0.00002143347}$.
 \subsubsection{Answer 2}
 \label{sec-1-1-2}
 The probability of guessing exactly three numbers is the probability
 of guessing three numbers times the probability of guessing other three
 not winning numbers, as many times as we can choose combinations of three
 out of six, i.e.:
-$\binom{6}{3} \times \frac{1}{6^3} \times \frac{5^3}{6^3} = 0.053583678$.
+$\binom{6}{3} \times \frac{1}{6^3} \times \frac{5^3}{6^3} = \num{0.053583678}$.
 \subsubsection{Answer 3}
 \label{sec-1-1-3}
 The probability of a six-digit number being a palindrome is the product
@@ -101,7 +102,7 @@ and third and fourth being the same.  Observe now that the condition of
 being the same is equivalent to requiring that one of the numbers of the
 pair be exactly of the six possible results, hence the probability of
 two given numbers matching is exactly $\frac{1}{6}$, thus total probability
-is $\frac{1}{6^3} = 0.0046296297$.
+is $\frac{1}{6^3} = \num{0.0046296297}$.
 
 Here's the calculation that verifies the results:
 
@@ -160,6 +161,246 @@ Here's the calculation that verifies the results:
 Chance of winning the lotery:     0.00002143347
 Chance of guessing exactly three: 0.053583678
 Chance of palindrome ticket:      0.0046296297
+\end{verbatim}
+\subsection{Problem 2}
+\label{sec-1-2}
+Given five country flags, four town flags and two army flags all hung
+together on a thread.
+
+\begin{enumerate}
+\item What is the chance that three first flags are the country flags?
+\item What is the chance that all the flags of the same kind hung together?
+\item What is the chance that between two army flags, there will be only
+the country flags?
+\item If three flags selected at random, what is the chance that at least
+two of them are of the same kind?
+\end{enumerate}
+
+\subsubsection{Answser 4}
+\label{sec-1-2-1}
+The chance of the first three flags being the country flags is the chance
+of the first being the country flag, times second, times third.
+The chance of the first is 5 in 11, the chance of second is 4 in 10 and
+the chance of third is 3 in 9.  Thus the total chance is
+$\frac{5 * 4 * 3}{11 * 10 * 9} = \num{0.0606060606058}$.
+\subsubsection{Answer 5}
+\label{sec-1-2-2}
+Observe, first, that there are only 3! possibilities for such arrangments,
+i.e.
+\begin{enumerate}
+\item \textbf{country}, \textbf{city}, \textbf{army}.
+\item \textbf{country}, \textbf{army}, \textbf{city}.
+\item \ldots{}
+\item \textbf{army}, \textbf{city}, \textbf{country}.
+\end{enumerate}
+
+Given the total number of ways the flags can be hung:
+\begin{equation*}
+  \frac{11!}{5!4!2!} = 6930,
+\end{equation*}
+
+it gives that there is only $\frac{3!}{6930} = \num{0.000865800865801}$
+chance the flags will hang in the specified order.
+\subsubsection{Answer 6}
+\label{sec-1-2-3}
+The number of ways country flags can be hung between the army flags are
+either one, or two, or three, or four, or five, for each case there is
+a number of ways the group of flags can be positioned on the rope.
+\begin{enumerate}
+\item There are $11-3+1=9$ ways to position the flags on the rope.
+\item There are $11-4+1=8$ ways to position the flags on the rope.
+\item There are $11-5+1=7$ ways to position the flags on the rope.
+\item There are $11-6+1=6$ ways to position the flags on the rope.
+\item There are $11-7+1=5$ ways to position the flags on the rope.
+\end{enumerate}
+
+Also observe that for each case, the remaining combinations of flags
+are defined by the number of flags we can permute times the number of
+ways we can position the army flags.
+
+\begin{enumerate}
+\item $\frac{8!}{4!4!} = 70$.
+\item $\frac{7!}{3!4!} = 35$.
+\item $\frac{6!}{2!4!} = 15$.
+\item $\frac{5!}{1!4!} = 5$.
+\item $\frac{4!}{4!} = 1$.
+\end{enumerate}
+
+Summing this all up gives:
+$\frac{70*9+35*8+15*7+5*6+1*5}{6930} = \num{0.151515151515}$.
+\subsubsection{Answer 7}
+\label{sec-1-2-4}
+We can divide this problem into two sub-problems:
+\begin{enumerate}
+\item In how many ways can we slect three first flags s.t. the first
+ant the second or first and the last will match.  We will have
+thee disjoint probabilities for each kind of flag weighted by
+their relative probablity:
+\begin{equation*}
+  \begin{aligned}
+    \frac{5}{11} \times \Big(\frac{4}{10} + \frac{4}{9}\Big)
+    \times{4 + 2}{10}  &= \num{0.30303030303} \\
+    \frac{4}{11} \times \Big(\frac{3}{10} + \frac{3}{9}\Big)
+    \times {5 + 2}{10} &= \num{0.193939393939} \\
+    \frac{2}{11} \times \Big(\frac{1}{10} + \frac{1}{9}\Big)
+    \times {5 + 4}{10} &= \num{0.0363636363636}.
+  \end{aligned}
+\end{equation*}
+
+\item And the probability that the last two flags are the same, this
+probability is again weighted by the first flag selected and
+summed for two remaining kinds of flags:
+\begin{equation*}
+  \begin{aligned}
+    \frac{5}{11} \times \Big(\frac{4}{10} \times \frac{3}{9} +
+    \frac{2}{10} \times \frac{1}{9}\Big) &= \num{0.0707070707067} \\
+    \frac{4}{11} \times \Big(\frac{5}{10} \times \frac{4}{9} +
+    \frac{2}{10} \times \frac{1}{9}\Big) &= \num{0.0888888888886} \\
+    \frac{2}{11} \times \Big(\frac{5}{10} \times \frac{4}{9} +
+    \frac{4}{10} \times \frac{3}{9}\Big) &= \num{0.0646464646463}.
+  \end{aligned}
+\end{equation*}
+\end{enumerate}
+
+Summing it up gives 
+\begin{equation*}
+  \begin{aligned}
+    \num{0.0707070707067} &+ \\
+    \num{0.0888888888886} &+ \\
+    \num{0.0646464646463} &+ \\
+    \num{0.30303030303}   &+ \\
+    \num{0.193939393939}  &+ \\
+    \num{0.0363636363636} &= \num{0.757575757575}.
+  \end{aligned}
+\end{equation*}
+
+The code to verify the answers:
+\lstset{language=Lisp,numbers=none}
+\begin{lstlisting}
+(defun shift-elements (vec low high)
+  (prog1 vec
+    (loop :for i :from high :downto low :do
+       (setf (aref vec (1+ i)) (aref vec i)))))
+
+(defun initialize-perms (vec element &optional (low 0))
+  (prog1 vec
+    (loop :with j := low
+       :for i :from low :below (length vec)
+       :if (eql (aref vec i) element) :do
+       (shift-elements vec j (1- i))
+       (setf (aref vec j) element j (1+ j)))))
+
+(defun can-move-index (vec element)
+  (loop :for i :from (1- (length vec)) :downto 0
+     :for current := (aref vec i)
+     :with prev := nil
+     :when (and prev
+                (not (eql prev element))
+                (eql current element))
+     :do (return i)
+     :end :do (setf prev current)))
+
+(defun move-index (vec index)
+  (prog1 vec
+    (psetf (aref vec (1+ index)) (aref vec index)
+           (aref vec index) (aref vec (1+ index)))))
+
+(defun permute-group (vec element &optional (low 0))
+  (cons
+   (copy-seq (initialize-perms vec element low))
+   (loop :with init := (initialize-perms vec element low)
+      :with last := low
+      :for moving := (can-move-index init element)
+      :while moving
+      :do (move-index init moving)
+      :when (< moving last) :do
+      (initialize-perms init element (1+ moving))
+      :end
+      :collect (copy-seq init)
+      :do (setf last moving))))
+
+(defun canonical (element repeat &optional (previous #()))
+  (loop :with result := (make-array (+ repeat (length previous)))
+     :for i :below repeat :do
+     (setf (aref result i) element)
+     :finally 
+     (return
+       (prog1 result
+         (loop :for j :from i :below (length result) :do
+            (setf (aref result j) (aref previous (- j i))))))))
+
+(defun permutations-with-repetition (groups)
+  (loop :with first := (car groups)
+     :with perms := (list (canonical (car first) (cdr first)))
+     :for (key . value) :in (cdr groups)
+     :do (setf perms
+               (loop :for perm :in perms
+                  :nconc (permute-group
+                          (canonical key value perm) key)))
+     :finally (return perms)))
+
+(defparameter *all-flags*
+  (permutations-with-repetition '((a . 5) (b . 4) (c . 2))))
+
+(defun first-three-a ()
+  (/ (loop :for flags :in *all-flags*
+        :when (equal (coerce (subseq flags 0 3) 'list) '(a a a))
+        :count 1)
+     (length *all-flags*)))
+
+(defun togetherp (flags)
+  (= 2 (loop :with previous := nil
+          :for elt :across flags
+          :when (and previous (not (eql elt previous)))
+          :count 1 :end
+          :do (setf previous elt))))
+
+(defun flags-hang-together ()
+  (/ (loop :for flags :in *all-flags*
+        :when (togetherp flags)
+        :count 1)
+     (length *all-flags*)))
+
+(defun between-army-p (flags)
+  (not
+   (loop :with flags-seen := 0
+      :with previous := nil
+      :for elt :across flags :do
+      (case elt
+        (b (when (= flags-seen 1) (return t)))
+        (c (when (eql previous 'c) (return t))
+           (incf flags-seen)))
+      (setf previous elt))))
+
+(defun between-army ()
+  (/ (loop :for flags :in *all-flags*
+        :when (between-army-p flags)
+        :count 1)
+     (length *all-flags*)))
+
+(defun first-three-duplicate ()
+  (/ (loop :for flags :in *all-flags*
+        :when (or (eql (aref flags 0) (aref flags 1))
+                  (eql (aref flags 1) (aref flags 2))
+                  (eql (aref flags 0) (aref flags 2)))
+        :count 1)
+     (length *all-flags*)))
+
+(format t "~&Chance three first flags are country flags: ~f~%~
+             Chance all flags hang together:             ~f~%~
+             Chance only city flags between army flags:  ~f~%~
+             Chance of duplicate in first three flags:   ~f~%"
+        (first-three-a)
+        (flags-hang-together)
+        (between-army)
+        (first-three-duplicate))
+\end{lstlisting}
+
+\begin{verbatim}
+Chance three first flags are country flags: 0.060606062
+Chance all flags hang together:             0.0008658009
+Chance only city flags between army flags:  0.15151516
+Chance of duplicate in first three flags:   0.75757575
 \end{verbatim}
 % Emacs 25.0.50.1 (Org mode 8.2.2)
 \end{document}
