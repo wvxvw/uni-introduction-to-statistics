@@ -1,4 +1,4 @@
-% Created 2015-04-11 Sat 20:56
+% Created 2015-04-11 Sat 23:44
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -402,5 +402,49 @@ Chance all flags hang together:             0.0008658009
 Chance only city flags between army flags:  0.15151516
 Chance of duplicate in first three flags:   0.75757575
 \end{verbatim}
+\subsection{Problem 3}
+\label{sec-1-3}
+Given five different research subject and ten students selecting from these
+subjects at random:
+\begin{enumerate}
+\item What is the chance all students will select the same subject?
+\item What is the chance there will be exactly 3 papers on the first subject?
+\item What is the chance two students will select the same subject?
+\item What is the chance that two particular students will choose the first subject,
+thee students will choose the second subject, four will choose the third
+subject and the rest will choose the fourth subject?
+\item What is the chance that only two of the five subjects will be selected?
+\end{enumerate}
+
+\subsubsection{Answer 8}
+\label{sec-1-3-1}
+The probability of selecting the subject is independent for each student,
+thus the total probability is the product of probabilities of each student
+selecting the same subject times number of subjects.  This gives:
+\begin{equation*}
+  5 \times \frac{1}{5^{10}} = \num{0.000000512}.
+\end{equation*}
+\subsubsection{Answer 9}
+\label{sec-1-3-2}
+The chance of having exactly three papers written on the first subject is
+the chance of writing thee papers times the chance of writing other papers
+times the number of ways the students can be assigned to papers.  This
+gives:
+$\binom{10}{3} \times \frac{1}{5^3} \times \frac{4^7}{5^7} = \num{0.201326592}$.
+\subsubsection{Answer 10}
+\label{sec-1-3-3}
+The chance of two students selecting a particular subject is the number of
+awailable subjects times the probability of selecting the same subject for
+two students.  I.e. $5 \times \frac{1}{5^2} = 0.2$.
+\subsubsection{Answer 11}
+\label{sec-1-3-4}
+
+
+\subsubsection{Answer 12}
+\label{sec-1-3-5}
+The chance that only two of the five subjects will be selected is the chance
+that every subsequent student selects from two of the possible subjects
+(independently) times the number of ways the subjects can be paired.  This
+gives $\Big(\frac{2}{5}\Big)^10 \times 45 = \num{0.004718592}$.
 % Emacs 25.0.50.1 (Org mode 8.2.2)
 \end{document}
