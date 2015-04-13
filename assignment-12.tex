@@ -1,4 +1,4 @@
-% Created 2015-04-11 Sat 23:45
+% Created 2015-04-14 Tue 00:07
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -446,5 +446,44 @@ The chance that only two of the five subjects will be selected is the chance
 that every subsequent student selects from two of the possible subjects
 (independently) times the number of ways the subjects can be paired.  This
 gives $\Big(\frac{2}{5}\Big)^{10} \times 45 = \num{0.004718592}$.
+\subsection{Problem 4}
+\label{sec-1-4}
+Given six pairs of different shoes, from which four shoes are selected at
+random:
+\begin{enumerate}
+\item What is the chance of drawing a pair of boots?
+\item What is the chance of drawing a single boot (without a pair)?
+\item What is the chance of drawing a pair of boots and two boots, which aren't
+a pair?
+\item What is the chance of all shoes being from distinct pairs?
+\end{enumerate}
+
+\subsubsection{Answer 13}
+\label{sec-1-4-1}
+The chance of drawing a pair of boots can be seen as follows: there are
+only $\binom{12}{4}$ arrangements of boots possible.  Of them in 
+$\binom{10}{2}$ contain ``other'' shoes, since we have no choice but to
+select the boots we are asked, the solution is given by:
+$\frac{\binom{10}{2}}{\binom{12}{4}} = \num{0.09090909}$.
+\subsubsection{Answer 14}
+\label{sec-1-4-2}
+The chance of selecting a single boot without a pair is similar to the one
+above. I.e. it is the number of ways to select three shoes from the remaining
+``other'' shoes multiplied by two (for left and right shoes).
+$\frac{\binom{10}{3}}{\binom{12}{4}} = \num{0.24242425}$.
+\subsubsection{Answer 15}
+\label{sec-1-4-3}
+Similar to the \ref{sec-1-4-1}, except we can only choose the remaining boots
+subtracting the number of times we draw two pairs of shoes:
+$\frac{\binom{10}{2} - 5}{\binom{12}{4}} = \num{0.08080808}$.
+\subsubsection{Answer 16}
+\label{sec-1-4-4}
+Using different approach, the number of ways shoes can be chosen without
+repetition can be given by: no matter the first shoe, the second can be
+only chosen in 10 ways such as not to form a pair.  The third can be
+chosen in 8 ways such as not to form a pair, and fourth can be chosen
+in only 6 ways such as not to form a pair.  In other words, the probability
+of drawing dissimilar shoes is the multiplicative inverse of the number of
+ways they can be chose.  This gives $\frac{6}{10 \times 8 \times 6} = 0.0125$.
 % Emacs 25.0.50.1 (Org mode 8.2.2)
 \end{document}

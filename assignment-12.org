@@ -435,3 +435,39 @@
     that every subsequent student selects from two of the possible subjects
     (independently) times the number of ways the subjects can be paired.  This
     gives $\Big(\frac{2}{5}\Big)^{10} \times 45 = \num{0.004718592}$.
+
+** Problem 4
+   Given six pairs of different shoes, from which four shoes are selected at
+   random:
+   1. What is the chance of drawing a pair of boots?
+   2. What is the chance of drawing a single boot (without a pair)?
+   3. What is the chance of drawing a pair of boots and two boots, which aren't
+      a pair?
+   4. What is the chance of all shoes being from distinct pairs?
+
+*** Answer 13
+    The chance of drawing a pair of boots can be seen as follows: there are
+    only $\binom{12}{4}$ arrangements of boots possible.  Of them in 
+    $\binom{10}{2}$ contain ``other'' shoes, since we have no choice but to
+    select the boots we are asked, the solution is given by:
+    $\frac{\binom{10}{2}}{\binom{12}{4}} = \num{0.09090909}$.
+
+*** Answer 14
+    The chance of selecting a single boot without a pair is similar to the one
+    above. I.e. it is the number of ways to select three shoes from the remaining
+    ``other'' shoes multiplied by two (for left and right shoes).
+    $\frac{\binom{10}{3}}{\binom{12}{4}} = \num{0.24242425}$.
+
+*** Answer 15
+    Similar to the [[Answer 13]], except we can only choose the remaining boots
+    subtracting the number of times we draw two pairs of shoes:
+    $\frac{\binom{10}{2} - 5}{\binom{12}{4}} = \num{0.08080808}$.
+
+*** Answer 16
+    Using different approach, the number of ways shoes can be chosen without
+    repetition can be given by: no matter the first shoe, the second can be
+    only chosen in 10 ways such as not to form a pair.  The third can be
+    chosen in 8 ways such as not to form a pair, and fourth can be chosen
+    in only 6 ways such as not to form a pair.  In other words, the probability
+    of drawing dissimilar shoes is the multiplicative inverse of the number of
+    ways they can be chose.  This gives $\frac{6}{10 \times 8 \times 6} = 0.0125$.
