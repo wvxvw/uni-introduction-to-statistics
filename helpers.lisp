@@ -176,3 +176,51 @@
                   (eql (aref flags 0) (aref flags 2)))
         :count 1)
      (length *all-flags*)))
+
+(defun combinations (input)
+  (labels ((%combinations (elt input)
+             (append input (loop :for comb :in input
+                              :collect (cons elt comb)))))
+    (loop :for elt :in input
+       :for result := (list (list elt))
+       :then (cons (list elt) (%combinations elt result))
+       :finally (return result))))
+
+(defun combinations-of (input length)
+  (remove-if (lambda (x) (/= (length x) length))
+             (combinations input)))
+
+(defparameter *shoes* (combinations-of '(1 2 3 4 5 6 7 8 9 10 11 12) 4))
+
+(defun has-pair-p (shoes)
+  (loop :for i :from 1 :to 6
+     :thereis (and (member (* i 2) shoes)
+                   (member (1- (* i 2)) shoes))))
+
+(defun single-pair-p (shoes)
+  (and (member 1 shoes) (member 2 shoes)
+       (not (has-pair-p (remove 1 (remove 2 shoes))))))
+
+(defun single-boot-p (shoes)
+  (or (and (member 1 shoes) (not (member 2 shoes)))
+      (and (member 2 shoes) (not (member 1 shoes)))))
+
+(defun chance-of-pair ()
+  (/ (loop :for shoes :in *shoes*
+        :when (and (member 1 shoes) (member 2 shoes)) :count 1)
+     (length *shoes*)))
+
+(defun chance-no-pairs ()
+  (/ (loop :for shoes :in *shoes*
+        :unless (has-pair-p shoes) :count 1)
+     (length *shoes*)))
+
+(defun chance-single-pair ()
+  (/ (loop :for shoes :in *shoes*
+        :when (single-pair-p shoes) :count 1)
+     (length *shoes*)))
+
+(defun chance-single-boot ()
+  (/ (loop :for shoes :in *shoes*
+        :when (single-boot-p shoes) :count 1)
+     (length *shoes*)))

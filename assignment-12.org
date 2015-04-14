@@ -456,7 +456,7 @@
     The chance of selecting a single boot without a pair is similar to the one
     above. I.e. it is the number of ways to select three shoes from the remaining
     ``other'' shoes multiplied by two (for left and right shoes).
-    $\frac{\binom{10}{3}}{\binom{12}{4}} = \num{0.24242425}$.
+    $\frac{2\binom{10}{3}}{\binom{12}{4}} = \num{0.48484847}$.
 
 *** Answer 15
     Similar to the [[Answer 13]], except we can only choose the remaining boots
@@ -471,3 +471,64 @@
     in only 6 ways such as not to form a pair.  In other words, the probability
     of drawing dissimilar shoes is the multiplicative inverse of the number of
     ways they can be chose.  This gives $\frac{6}{10 \times 8 \times 6} = 0.0125$.
+
+    
+    #+BEGIN_SRC lisp :results output :exports both
+      (defun combinations (input)
+        (labels ((%combinations (elt input)
+                   (append input (loop :for comb :in input
+                                    :collect (cons elt comb)))))
+          (loop :for elt :in input
+             :for result := (list (list elt))
+             :then (cons (list elt) (%combinations elt result))
+             :finally (return result))))
+      
+      (defun combinations-of (input length)
+        (remove-if (lambda (x) (/= (length x) length))
+                   (combinations input)))
+      
+      (defparameter *shoes*
+        (combinations-of '(1 2 3 4 5 6 7 8 9 10 11 12) 4))
+      
+      (defun has-pair-p (shoes)
+        (loop :for i :from 1 :to 6
+           :thereis (and (member (* i 2) shoes)
+                         (member (1- (* i 2)) shoes))))
+      
+      (defun single-pair-p (shoes)
+        (and (member 1 shoes) (member 2 shoes)
+             (not (has-pair-p (remove 1 (remove 2 shoes))))))
+      
+      (defun single-boot-p (shoes)
+        (or (and (member 1 shoes) (not (member 2 shoes)))
+            (and (member 2 shoes) (not (member 1 shoes)))))
+      
+      (defun chance-of-pair ()
+        (/ (loop :for shoes :in *shoes*
+              :when (and (member 1 shoes) (member 2 shoes)) :count 1)
+           (length *shoes*)))
+      
+      (defun chance-no-pairs ()
+        (/ (loop :for shoes :in *shoes*
+              :unless (has-pair-p shoes) :count 1)
+           (length *shoes*)))
+      
+      (defun chance-single-pair ()
+        (/ (loop :for shoes :in *shoes*
+              :when (single-pair-p shoes) :count 1)
+           (length *shoes*)))
+      
+      (defun chance-single-boot ()
+        (/ (loop :for shoes :in *shoes*
+              :when (single-boot-p shoes) :count 1)
+           (length *shoes*)))
+      
+      (format t "~&Chance to draw a pair of boots:  ~f~%~
+                   Chance of drawing no pairs:      ~f~%~
+                   Chance of drawing a single pair: ~f~%~
+                   Chance of drawing a single boot: ~f"
+              (chance-of-pair)
+              (chance-no-pairs)
+              (chance-single-pair)
+              (chance-single-boot))
+    #+END_SRC
