@@ -1,4 +1,4 @@
-% Created 2015-04-15 Wed 22:37
+% Created 2015-04-15 Wed 23:01
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -438,8 +438,14 @@ awailable subjects times the probability of selecting the same subject for
 two students.  I.e. $5 \times \frac{1}{5^2} = 0.2$.
 \subsubsection{Answer 11}
 \label{sec-1-3-4}
-
-
+The chance of students dividing into four groups of 2, 3, 4 and 1 is that
+of the number of ways we can chose 2 students out of 10 available, multiplied
+by number of ways we can choose 3 students from the remaining 8 and so on.
+This gives:
+\begin{equation*}
+  \frac{\binom{10}{2} \times \binom{8}{3} \times \binom{5}{4}}{5^{10}} =
+  \num{0.00129024}.
+\end{equation*}
 \subsubsection{Answer 12}
 \label{sec-1-3-5}
 The chance that only two of the five subjects will be selected is the chance
