@@ -1,4 +1,4 @@
-% Created 2015-04-14 Tue 23:39
+% Created 2015-04-15 Wed 22:37
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -478,14 +478,15 @@ subtracting the number of times we draw two pairs of shoes:
 $\frac{\binom{10}{2} - 5}{\binom{12}{4}} = \num{0.08080808}$.
 \subsubsection{Answer 16}
 \label{sec-1-4-4}
-Using different approach, the number of ways shoes can be chosen without
-repetition can be given by: no matter the first shoe, the second can be
-only chosen in 10 ways such as not to form a pair.  The third can be
-chosen in 8 ways such as not to form a pair, and fourth can be chosen
-in only 6 ways such as not to form a pair.  In other words, the probability
-of drawing dissimilar shoes is the multiplicative inverse of the number of
-ways they can be chose.  This gives $\frac{6}{10 \times 8 \times 6} = 0.0125$.
-
+Not having any pairs is the compliment of having exactly one pair 
+combined with having exactly two pairs.  For the first case, there
+are six ways a pair can be selected and the remaining two shoes can
+be selected without forming a pair in five ways each.  Then their
+pairs can only be selected in four different ways.  This gives
+$6 \times 5 \times 4 = 120$ combinations.  And there is exactly
+as many ways to select two pairs of shoes.  This gives (provided
+we already calculated $n(\Omega) = 495$)
+$\frac{120 \times 2}{495} = \num{0.484848484848}$.
 
 \lstset{language=Lisp,numbers=none}
 \begin{lstlisting}
