@@ -1,0 +1,276 @@
+# -*- fill-column: 80; org-confirm-babel-evaluate: nil -*-
+
+#+TITLE:     Assignment 13, Introduction to Statistics
+#+AUTHOR:    Oleg Sivokon
+#+EMAIL:     olegsivokon@gmail.com
+#+DATE:      <2015-03-27 Fri>
+#+DESCRIPTION: Third asssignment in the course Introduction to Statistics
+#+KEYWORDS: Conditional probabilities, assignment
+#+LANGUAGE: en
+#+LaTeX_CLASS: article
+#+LATEX_HEADER: \usepackage[usenames,dvipsnames]{color}
+#+LATEX_HEADER: \usepackage[backend=bibtex, style=numeric]{biblatex}
+#+LATEX_HEADER: \usepackage[scientific-notation=true]{siunitx}
+#+LATEX_HEADER: \usepackage{commath}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{marginnote}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER: \usepackage{enumerate}
+#+LATEX_HEADER: \hypersetup{urlcolor=blue}
+#+LATEX_HEADER: \hypersetup{colorlinks,urlcolor=blue}
+#+LATEX_HEADER: \addbibresource{bibliography.bib}
+#+LATEX_HEADER: \setlength{\parskip}{16pt plus 2pt minus 2pt}
+#+LATEX_HEADER: \definecolor{codebg}{rgb}{0.96,0.99,0.8}
+#+LATEX_HEADER: \definecolor{codestr}{rgb}{0.46,0.09,0.2}
+
+#+BEGIN_SRC emacs-lisp :exports none
+(setq org-latex-pdf-process
+        '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -bibtex -f %f")
+        org-latex-listings t
+        org-src-fontify-natively t
+        org-babel-latex-htlatex "htlatex")
+(defmacro by-backend (&rest body)
+    `(cl-case (when (boundp 'backend) (org-export-backend-name backend))
+       ,@body))
+#+END_SRC
+
+#+RESULTS:
+: by-backend
+
+#+BEGIN_LATEX
+  \lstset{ %
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+    breaklines=false,
+    captionpos=b,                    % sets the caption-position to bottom
+    framexleftmargin=10pt,
+    xleftmargin=10pt,
+    framerule=0pt,
+    frame=tb,                        % adds a frame around the code
+    keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+    keywordstyle=\color{blue},       % keyword style
+    showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+    showstringspaces=false,          % underline spaces within strings only
+    showtabs=false,                  % show tabs within strings adding particular underscores
+    stringstyle=\color{codestr},     % string literal style
+    tabsize=2,                       % sets default tabsize to 2 spaces
+  }
+#+END_LATEX
+
+\clearpage
+
+* Problems
+
+** Problem 1
+   Given the probabilities of two basketball teams $A$ and $B$ of
+   + winning :: $P(W | A) = 0.6$, $P(W | B) = 0.3$.
+   + drawing :: $P(D) = 0.1$.
+   
+   
+   1. What is the chance the teams will play only two games to establish
+      the winner?
+   2. The third game was a draw.  What is the chance $A$ wins in the
+      first round?
+   3. Provided $A$ wins the tournament, what is the chance that at least three
+      games had been played?
+
+*** Answer 1
+    The way to look at this problem is equivalent to counting all game pairs
+    where either $A$ wins twice or $B$ wins twice or either one of the games is
+    a draw, and dividing it into all possible outcomes (the $\Omega$) of two
+    consequent games.  Since the probabilities of winning are independent, using
+    the product law, $A$ will win with probability $0.6 \times 0.6$ and $B$ will
+    win with the probability $0.3 \times 0.3$.  Whereas the probability of two
+    games finishing with any result is trivially 1.  Since the probabilities of
+    both teams winning subsequent games are disjoint, we sum them, up, and this
+    gives us $0.1 + 0.36 + 0.09 - 0.01 = 0.54$ chance of tournament ending
+    after playing just two games.  (0.01 was added to compensate for the case
+    when teams draw two times).
+
+*** Answer 2
+    Since we already given that there was a third game, we will only concern
+    ourselves with three different possibilities this could've happen:
+    1. Two draws.
+    2. $A$ wins $B$ wins.
+    3. $B$ wins $A$ wins.
+       
+    It is easy to see (from commutativity of multiplication) that options (2)
+    and (3) are equally likely, thus the chance of $A$ being the first to
+    win is $(1 - 0.1 \times 0.1) / 2 = 0.495$.
+
+*** Answer 3
+    The chance of $A$ not winning in just two games is the chance of $A$ winning
+    two subsequent games, or winning a game and drawing.  Since the probability
+    of $A$ is a given, substracting from it the chance of $A$ winning in under
+    three games will give us the chance of $A$ winning in three games or more:
+    $0.6 - 0.6 \times 0.6 + 2 \times 0.1 \times 0.6 = 0.36$.
+
+    Below is the model testing the answers:
+
+    #+BEGIN_SRC python
+      import random
+      
+      def random_game():
+          game = random.random()
+          if game < 0.1: return 'draw'
+          elif game < 0.4: return 'b'
+          else: return 'a'
+      
+      def tournament():
+          winner = None
+          previous = None
+          turns = 0
+          game = []
+          while not winner:
+              candidate = random_game()
+              turns += 1
+              if candidate == 'a' and previous in ['a', 'draw']:
+                  winner = 'a'
+              elif candidate == 'b' and previous in ['b', 'draw']:
+                  winner = 'b'
+              previous = candidate
+              game.append(candidate)
+          return winner, turns, game
+          
+      def game_ends_in_two(tries):
+          two_rounds_games = 0
+          for i in xrange(tries):
+              winner, turns, game = tournament()
+              if turns == 2:
+                  two_rounds_games += 1
+          return float(two_rounds_games) / tries
+      
+      def a_wins_three_rounds_game(tries):
+          games = 0
+          a_wins = 0
+          for i in xrange(tries):
+              winner, turns, game = tournament()
+              if len(game) > 2 and game[2] == 'draw':
+                  games += 1
+                  if game[0] == 'a': a_wins += 1
+          return float(a_wins) / games
+                  
+      def chance_player_wins(player, times):
+          wins = 0
+          for i in xrange(times):
+              winner, turns, game = tournament()
+              if winner == player:
+                  wins += 1
+          return float(wins) / times
+      
+      def chance_game_won_by(player, times):
+          wins = 0
+          for i in xrange(times):
+              if player == random_game():
+                  wins += 1
+          return float(wins) / times
+      
+      def at_least_three_games_played(times):
+          good = 0
+          games = 0
+          for i in xrange(times):
+              winner, turns, game = tournament()
+              if winner == 'a':
+                  games += 1
+                  if len(game) > 2:
+                      good += 1
+          return float(good) / games
+      
+    #+END_SRC
+    
+** Problem 2
+   Some of the plates produced in a factory can be defective in two different
+   ways: with a chance of 0.15 there can be cracks in a plate and with a chance
+   of 0.25 the coloring of the plate may not be uniform.  The chance the
+   plate will be defective is 0.35.
+
+   1. One plate was found to be defective, what is the chance of this plate
+      to have cracks?
+   2. One plate was found to have cracks, what is the chance it will also
+      have uneven coating?
+   3. A plate was found to have no cracks, what is the chance of the plate
+      to be painted unevenly?
+
+*** Answer 4
+    Total probability of having cracks is given to be 0.15, the probability of
+    being defective is 0.35, thus the chance of a plate having cracks, provided
+    it is defective is 0.15 in 0.35, i.e. $\num{0.428571428571}$.
+
+*** Answer 5
+    The chance of a plate having both cracks and uneven coating is one in three.
+    This is easy to see using the formula $P(A \cap B) = P(A) + P(B) - P(A \cup B)$.
+    Substituting gives: $P(A \cap B) = 0.15 + 0.25 - 0.35 = 0.05$.
+
+*** Answer 6
+    Of all plates 0.65 aren't defective, of the rest 0.1 have cracks, but are
+    painted properly (recall the result obtained in [[Answer 5]].), thus the chance
+    of a plate to have been painted unevenly is $1 - 0.65 - 0.1 = 0.25$.
+
+** Problem 3
+   Three coffee grinding machines produce all the coffee packed at a factory.
+   Machine $A$ grinds 0.55 of all the coffee, machine $B$ grinds 0.3 and machine
+   $C$ grinds the remaining 0.15 of coffee.  The coffee can be of fine or of a
+   coarce grind.  With a chance of 0.4, the machine $A$ produces fine grinds of
+   coffee.  The machine $B$ produces fine grinds with the 0.5 chance.
+   It is also known that the chance of producing fine grind of coffee overall
+   is 0.4.
+
+   1. A chosen pack of coffee was produced by machine $C$.  What is the chance
+      the coffee was ground finely?
+   2. A chosen pack of coffee was found to be of a fine grind.  What is the
+      chance it was produced by machine $B$?
+   3. Are events ``the coffee is finely ground'' and ``the coffee was ground
+      by the machine $A$'' are independent?
+
+*** Answer 7
+    The chance of a pack of coffee to be ground finely, given it came from machine
+    $C$ is the total chance of coffee being ground finely sans the chance it
+    was ground finely and came from the machine $A$ or $B$.  Thus:
+    $x = \frac{0.4 - 0.55 \times 0.4 - 0.3 \times 0.5}{0.15} = 0.2$.
+
+*** Answer 8
+    The chance of a pack of coffee originating from machine $B$ is the chance
+    it was a finely ground coffe produced by machine $B$ divided by the total
+    chance it was finely ground: $x = \frac{0.3 \times 0.5}{0.4} = 0.375$.
+
+*** Answer 9
+    These events are not independent.  Independent events are such that their
+    intersection is an empty set, but there are clearly packs of coffee produced
+    by machine $B$, which are also finely ground /(exactly half of them)/.
+
+
+** Problem 4
+   Given a choice of three loaded coins, $A$ with a chance of tails being $\frac{1}{3}$,
+   $B$ with the chance of tails being $\frac{1}{2}$ and $C$ with the chance of tails
+   being $\frac{2}{3}$.  A random coin is selected.
+
+   1. What is the chance of tossing tails?
+   2. Same coin is tossed one more time, what is the chance it lends tails twice?
+   3. Given the coin landed tails twice, what is the chance the coin tossed
+      is the fair one?
+   4. Given the coin landed tails twice, what is the chance it will lend tails
+      again?
+
+*** Answer 10
+    Since there is no preference towards any one of three coins, we will treat
+    the chance of choosing one as being equally likely.  Thus the chance of
+    tossing tails is simply the average of the three:
+    $x = \Big(\frac{1}{3} + \frac{1}{2} + \frac{2}{3}\Big) \times \frac{1}{3} = \frac{1}{2}$.
+
+*** Answer 11
+    Using the product law and the previous answer gives
+    $\frac{1}{2} \times \frac{1}{2} = \frac{1}{4}$.
+
+*** Answer 12
+    We can calculate how each one of the coins contributes towards the total
+    chance of tossing tails (obtained in the previous answer).  This is given by
+    $P(A) = \frac{1}{9}$, $P(C) = \frac{4}{9}$ and $P(B) = \frac{1}{4}$.  The
+    probability of choosing the fair coin given it landed tails twice is the
+    $\frac{P(B)}{P(A) + P(B) + P(C)} = \frac{1}{4} \times \frac{36}{29} = \frac{9}{29}$.
+
+*** Answer 13
+    The chance of coin landing whichever way is independent of how it landed before,
+    so it will be the same as the chance of a coin landing tails, already given
+    in the [[Answer 10]], viz. $\frac{1}{2}$.
