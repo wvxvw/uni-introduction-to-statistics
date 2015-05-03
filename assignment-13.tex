@@ -1,4 +1,4 @@
-% Created 2015-04-23 Thu 17:03
+% Created 2015-05-03 Sun 13:14
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -45,24 +45,24 @@
 \tableofcontents
 
 
-\lstset{ %
-  backgroundcolor=\color{codebg},
-  basicstyle=\ttfamily\scriptsize,
-  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
-  breaklines=false,
-  captionpos=b,                    % sets the caption-position to bottom
-  framexleftmargin=10pt,
-  xleftmargin=10pt,
-  framerule=0pt,
-  frame=tb,                        % adds a frame around the code
-  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
-  keywordstyle=\color{blue},       % keyword style
-  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
-  showstringspaces=false,          % underline spaces within strings only
-  showtabs=false,                  % show tabs within strings adding particular underscores
-  stringstyle=\color{codestr},     % string literal style
-  tabsize=2,                       % sets default tabsize to 2 spaces
-}
+  \lstset{ %
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+    breaklines=false,
+    captionpos=b,                    % sets the caption-position to bottom
+    framexleftmargin=10pt,
+    xleftmargin=10pt,
+    framerule=0pt,
+    frame=tb,                        % adds a frame around the code
+    keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+    keywordstyle=\color{blue},       % keyword style
+    showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+    showstringspaces=false,          % underline spaces within strings only
+    showtabs=false,                  % show tabs within strings adding particular underscores
+    stringstyle=\color{codestr},     % string literal style
+    tabsize=2,                       % sets default tabsize to 2 spaces
+  }
 
 \clearpage
 
@@ -83,23 +83,24 @@ Given the probabilities of two basketball teams $A$ and $B$ of
 the winner?
 \item The third game was a draw.  What is the chance $A$ wins in the
 first round?
-\item Provided $A$ wins the tournament, what is the chance that at least three
+\item Provided $A$ wins the tournament, what is the chance that three
 games had been played?
 \end{enumerate}
 
 \subsubsection{Answer 1}
 \label{sec-1-1-1}
-The way to look at this problem is equivalent to counting all game pairs
-where either $A$ wins twice or $B$ wins twice or either one of the games is
-a draw, and dividing it into all possible outcomes (the $\Omega$) of two
-consequent games.  Since the probabilities of winning are independent, using
-the product law, $A$ will win with probability $0.6 \times 0.6$ and $B$ will
-win with the probability $0.3 \times 0.3$.  Whereas the probability of two
-games finishing with any result is trivially 1.  Since the probabilities of
-both teams winning subsequent games are disjoint, we sum them, up, and this
-gives us $0.1 + 0.36 + 0.09 - 0.01 = 0.54$ chance of tournament ending
-after playing just two games.  (0.01 was added to compensate for the case
-when teams draw two times).
+The game can end in two turns if:
+\begin{enumerate}
+\item Teams draw the first time and then either one of them wins, the probability
+of this happening is $0.1 * (0.6 + 0.3) = 0.09$.
+\item Alternatively, if $A$ wins, either draw or repeated victory will do, 
+the probability of this happening is $0.6 * (0.6 + 0.1) = 0.42$.
+\item Finally, if $B$ wins, the probability of ending early is:
+       $0.3 * (0.3 + 0.1) = 0.12$
+\end{enumerate}
+
+Summing up gives the total chances of the game ending in two rounds:
+$0.09 + 0.42 + 0.12 = 0.63$.
 \subsubsection{Answer 2}
 \label{sec-1-1-2}
 Since we already given that there was a third game, we will only concern
@@ -115,15 +116,28 @@ and (3) are equally likely, thus the chance of $A$ being the first to
 win is $(1 - 0.1 \times 0.1) / 2 = 0.495$.
 \subsubsection{Answer 3}
 \label{sec-1-1-3}
-The chance of $A$ not winning in just two games is the chance of $A$ winning
-two subsequent games, or winning a game and drawing.  Since the probability
-of $A$ is a given, substracting from it the chance of $A$ winning in under
-three games will give us the chance of $A$ winning in three games or more:
-$0.6 - 0.6 \times 0.6 + 2 \times 0.1 \times 0.6 = 0.36$.
+Similarly to the first answer, $A$ wins in two games if it either:
+\begin{enumerate}
+\item $A$ wins, $A$ wins, $p = 0.6 * 0.6 = 0.36$.
+\item $A$ wins, draw, $p = 0.6 * 0.1 = 0.06$.
+\item draw, $A$ wins, $p = 0.1 * 0.6 = 0.06$.
+\end{enumerate}
+
+All together: $0.48$.  The chance $A$ wins in three games is:
+\begin{enumerate}
+\item $A$ wins, $B$ wins $A$ wins, $p = 0.6 * 0.3 * 0.6 = 0.108$.
+\item $B$ wins, $A$ wins, $A$ wins, $p = 0.3 * 0.6 * 0.6 = 0.108$.
+\item draw, draw, $A$ wins, $p = 0.1 * 0.1 * 0.6 = 0.006$.
+\end{enumerate}
+
+All together: $0.222$. Which makes the total chances of $A$ to win $0.48 +
+    0.222 = 0.702$, thus the fraction of the tournaments won by $A$ that lasted
+for three rounds is $\frac{0.222}{0.702} = \num{0.31623932}$.
 
 Below is the model testing the answers:
 
-\begin{verbatim}
+\lstset{language=Python,numbers=none}
+\begin{lstlisting}
 import random
 
 def random_game():
@@ -132,66 +146,54 @@ def random_game():
     elif game < 0.4: return 'b'
     else: return 'a'
 
-def tournament():
-    winner = None
-    previous = None
-    turns = 0
-    game = []
-    while not winner:
-        candidate = random_game()
-        turns += 1
-        if candidate == 'a' and previous in ['a', 'draw']:
-            winner = 'a'
-        elif candidate == 'b' and previous in ['b', 'draw']:
-            winner = 'b'
-        previous = candidate
-        game.append(candidate)
-    return winner, turns, game
+def finite_tournament():
+    outcomes = []
+    wins = ['drawa', 'drawb', 'aa', 'bb', 'adraw', 'bdraw']
+    for g in range(3):
+        outcomes.append(random_game())
+        if ''.join(outcomes) in wins: break
+    return outcomes
 
 def game_ends_in_two(tries):
     two_rounds_games = 0
     for i in xrange(tries):
-        winner, turns, game = tournament()
-        if turns == 2:
+        game = finite_tournament()
+        if len(game) == 2:
             two_rounds_games += 1
     return float(two_rounds_games) / tries
 
 def a_wins_three_rounds_game(tries):
-    games = 0
-    a_wins = 0
+    games, a_wins = 0, 0
     for i in xrange(tries):
-        winner, turns, game = tournament()
+        game = finite_tournament()
         if len(game) > 2 and game[2] == 'draw':
             games += 1
             if game[0] == 'a': a_wins += 1
     return float(a_wins) / games
 
-def chance_player_wins(player, times):
-    wins = 0
-    for i in xrange(times):
-        winner, turns, game = tournament()
-        if winner == player:
-            wins += 1
-    return float(wins) / times
-
-def chance_game_won_by(player, times):
-    wins = 0
-    for i in xrange(times):
-        if player == random_game():
-            wins += 1
-    return float(wins) / times
-
 def at_least_three_games_played(times):
-    good = 0
-    games = 0
+    good, games = 0, 0
     for i in xrange(times):
-        winner, turns, game = tournament()
-        if winner == 'a':
+        game = finite_tournament()
+        if game[-1] == 'a' or ''.join(game) == 'adraw':
             games += 1
-            if len(game) > 2:
-                good += 1
+            if len(game) > 2: good += 1
     return float(good) / games
-\end{verbatim}
+
+print '''
++ Game ends in two turns: $\\num{%f}$
++ A wins first round: $\\num{%f}$
++ Three games were played: $\\num{%f}$
+''' % (game_ends_in_two(100000),
+       a_wins_three_rounds_game(100000),
+       at_least_three_games_played(100000))
+\end{lstlisting}
+
+\begin{itemize}
+\item Game ends in two turns: $\num{0.631370}$
+\item A wins first round: $\num{0.486479}$
+\item Three games were played: $\num{0.318114}$
+\end{itemize}
 \subsection{Problem 2}
 \label{sec-1-2}
 Some of the plates produced in a factory can be defective in two different
@@ -258,7 +260,6 @@ chance it was finely ground: $x = \frac{0.3 \times 0.5}{0.4} = 0.375$.
 These events are not independent.  Independent events are such that their
 intersection is an empty set, but there are clearly packs of coffee produced
 by machine $B$, which are also finely ground \emph{(exactly half of them)}.
-
 \subsection{Problem 4}
 \label{sec-1-4}
 Given a choice of three loaded coins, $A$ with a chance of tails being $\frac{1}{3}$,
@@ -282,8 +283,11 @@ tossing tails is simply the average of the three:
 $x = \Big(\frac{1}{3} + \frac{1}{2} + \frac{2}{3}\Big) \times \frac{1}{3} = \frac{1}{2}$.
 \subsubsection{Answer 11}
 \label{sec-1-4-2}
-Using the product law and the previous answer gives
-$\frac{1}{2} \times \frac{1}{2} = \frac{1}{4}$.
+There is an equal chance to select all coins, therefore we will need to
+divide the total in three.  For each coin the chance of throwing tails
+subsequently is given by the probability of throwing tails squared, this
+gives: $(\frac{2}{3})^2 \times (\frac{1}{2})^2 \times (\frac{1}{2})^2)
+    \times \frac{1}{3} = \frac{29}{108}$.
 \subsubsection{Answer 12}
 \label{sec-1-4-3}
 We can calculate how each one of the coins contributes towards the total
@@ -293,8 +297,73 @@ probability of choosing the fair coin given it landed tails twice is the
 $\frac{P(B)}{P(A) + P(B) + P(C)} = \frac{1}{4} \times \frac{36}{29} = \frac{9}{29}$.
 \subsubsection{Answer 13}
 \label{sec-1-4-4}
-The chance of coin landing whichever way is independent of how it landed before,
-so it will be the same as the chance of a coin landing tails, already given
-in the \ref{sec-1-4-1}, viz. $\frac{1}{2}$.
+The fact that the coin landed tails twice shifts the probabilities of that
+coin towards being the $C$ coin.  We already calculated the total probability
+of a coin landing tails after two tosses (in \ref{sec-1-4-2}), now we need to find
+how much every coin contributes to that probability and multiply that with
+the probability of each coin landing on tails.  To get single contributions
+we will multiply each contribution with the total's inverse: $\frac{108}{29}$.
+$\frac{2 * 108}{3 * 29} + \frac{108}{2 * 29} * \frac{108}{3 * 29} = \frac{162}{29}$.
+
+Below is the code that models the coin tosses:
+
+\lstset{language=Python,numbers=none}
+\begin{lstlisting}
+import random
+
+def select_coin():
+    tails = 0
+    chance = random.random() * 3
+    if chance <= 1: tails = 1.0 / 3
+    elif chance <= 2: tails = 0.5
+    else: tails = 2.0 / 3
+    return tails
+
+def chance_of_tails(times):
+    return sum(select_coin() for x in xrange(times)) / times
+
+def chance_two_tails(times):
+    return sum(select_coin() ** 2
+               for x in xrange(times)) / times
+
+def chance_of_fair_two_tails(times):
+    fair, total = 0.0, 0.0
+    for x in xrange(times):
+        coin = select_coin() ** 2
+        if coin == 0.25: fair += coin
+        total += coin
+    return fair / total
+
+def chance_third_tails(times):
+    two_thirds, half, third, total = 0.0, 0.0, 0.0, 0.0
+    for x in xrange(times):
+        coin = select_coin() ** 2
+        if coin == 0.25: half += coin
+        elif coin < 0.25: third += coin
+        else: two_thirds += coin
+        total += coin
+    two_thirds /= total
+    half /= total
+    third /= total
+    return two_thirds * 2 / 3 + half / 2 + third / 3
+
+print '''
++ Probability of tossing tails: $\\num{%s}$
++ Probability of tossing two tails: $\\num{%s}$
++ Chance of fair coin given two tails: $\\num{%s}$
++ Chance third toss will be tails: $\\num{%s}$
+''' % tuple(f(100000)
+            for f in [chance_of_tails,
+                      chance_two_tails,
+                      chance_of_fair_two_tails,
+                      chance_third_tails])
+\end{lstlisting}
+
+\begin{itemize}
+\item Probability of tossing tails: $\num{0.499205}$
+\item Probability of tossing two tails: $\num{0.268951944444}$
+\item Chance of fair coin given two tails: $\num{0.31315176421}$
+\item Chance third toss will be tails: $\num{0.568445329413}$
+\end{itemize}
 % Emacs 25.0.50.1 (Org mode 8.2.2)
 \end{document}
