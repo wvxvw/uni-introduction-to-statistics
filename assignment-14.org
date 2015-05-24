@@ -1,0 +1,254 @@
+# -*- fill-column: 80; org-confirm-babel-evaluate: nil -*-
+
+#+TITLE:     Assignment 14, Introduction to Statistics
+#+AUTHOR:    Oleg Sivokon
+#+EMAIL:     olegsivokon@gmail.com
+#+DATE:      <2015-05-24 Sun>
+#+DESCRIPTION: Third assignment in the course Introduction to Statistics
+#+KEYWORDS: Conditional probabilities, assignment
+#+LANGUAGE: en
+#+LaTeX_CLASS: article
+#+LATEX_HEADER: \usepackage[usenames,dvipsnames]{color}
+#+LATEX_HEADER: \usepackage[scientific-notation=true]{siunitx}
+#+LATEX_HEADER: \usepackage{commath}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{marginnote}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER: \usepackage{enumerate}
+#+LATEX_HEADER: \usepackage{systeme}
+#+LATEX_HEADER: \hypersetup{urlcolor=blue}
+#+LATEX_HEADER: \hypersetup{colorlinks,urlcolor=blue}
+#+LATEX_HEADER: \setlength{\parskip}{16pt plus 2pt minus 2pt}
+#+LATEX_HEADER: \definecolor{codebg}{rgb}{0.96,0.99,0.8}
+#+LATEX_HEADER: \definecolor{codestr}{rgb}{0.46,0.09,0.2}
+
+#+BEGIN_SRC emacs-lisp :exports none
+(setq org-latex-pdf-process
+        '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -f %f")
+        org-latex-listings t
+        org-src-fontify-natively t
+        org-babel-latex-htlatex "htlatex")
+(defmacro by-backend (&rest body)
+    `(cl-case (when (boundp 'backend) (org-export-backend-name backend))
+       ,@body))
+#+END_SRC
+
+#+RESULTS:
+: by-backend
+
+#+BEGIN_LATEX
+  \lstset{ %
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+    breaklines=false,
+    captionpos=b,                    % sets the caption-position to bottom
+    framexleftmargin=10pt,
+    xleftmargin=10pt,
+    framerule=0pt,
+    frame=tb,                        % adds a frame around the code
+    keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+    keywordstyle=\color{blue},       % keyword style
+    showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+    showstringspaces=false,          % underline spaces within strings only
+    showtabs=false,                  % show tabs within strings adding particular underscores
+    stringstyle=\color{codestr},     % string literal style
+    tabsize=2,                       % sets default tabsize to 2 spaces
+  }
+
+\clearpage
+
+#+END_LATEX
+
+* Problems
+
+** Problem 1
+   An ant travels 4 meters to the left with a chance 0.4 and 3 meters to the right
+   with a chance 0.6 every day.
+   1. What is the expected value and the variance of ant's position to the right
+      of starting point?
+   2. What is the probability of ant moving to the right for the first time
+      on the fourth day?
+   3. What is the chance the ant will walk 9 meters to the right by the end of
+      day ten?
+   4. What is the expected value and variance after ten days?
+
+*** Answer 1
+    $E(x)=0.4 \cdot (-4) + 0.6 \cdot 3 = 1.8 - 1.6 = 0.2$.  In other words: the
+    expected value is just a weighted sum of all possible outcomes.
+
+*** Answer 2
+    In order to move right for the first time on the fourth day the ant needs
+    to move left on three previous days, hence, using the product law:
+    $P(x) = 0.4^3 = 0.064$.
+
+*** Answer 3
+    The chance of moving 9 meters to the right is the chance of moving $x$
+    days to the left and $y$ days to the right s.t. $x \cdot (-4) + y \cdot 3 = 9$.
+    Since we also know that the ant needs to spend exactly 10 days to get
+    to its destination, we obtain a system of linear equations:
+    #+HEADER: :exports results
+    #+HEADER: :results (by-backend (pdf "latex") (t "raw"))
+    #+BEGIN_SRC latex
+      \begin{eqnarray*}
+        \systeme*{-4x + 3y = 9, x + y = 10} \\
+        x              &=& 10 - y \\
+        3y - 4(10 - y) &=& 9 \\
+        3y - 40 + 4y   &=& 9 \\
+        7y             &=& 49 \\
+        y              &=& 7 \\
+        x              &=& 3\;.
+      \end{eqnarray*}
+    #+END_SRC
+
+    From this, the chance of getting 9 meters to the right by the end of
+    the tenth day is $P(x) = 0.6^7 \cdot 0.4^3 = \num{0.0017915904}$.
+
+*** Answer 4
+    The expected value by the day ten is just the sum of ten expected values of
+    the movement carried out in one day, thus $E(10x) = 10E(x) = 10 \cdot 0.2 =
+    2$.
+
+** Problem 2
+   Yarden rolls a four-sided fair die until he rolls 1.
+   1. What is the chance that he will roll the die exactly four times?
+   2. What is the expected value of times he will roll the die?
+
+   Sharon, too, rolls the same die, but she will cease after rolling it just
+   six times.  What is the chance Sharon will not roll 1?
+
+   Alon rolls the same die.  He wants to roll 1 three times, not necessarily
+   in succession.  What is the chance he will roll the dice eight times?
+
+*** Answer 5
+    It's either Yarden rolls 1 or he rolls 2, 3, or 4, since the die is fair,
+    the chance of rolling 1 is $\frac{1}{4}$, the chance of not rolling 1 is
+    thus $\frac{3}{4}$.  The chance of not rolling 1 for the first three times
+    and rolling it afterwards is $\left(\frac{3}{4}\right)^3 \cdot \frac{1}{4} =
+    \frac{27}{64 \cdot 4} = \frac{27}{256}$.
+
+*** Answer 6
+    Since Yarden expects to roll 1 with a chance $\frac{1}{4}$, he expects to
+    finish after $\frac{x}{4}=1$ tries, i.e. on the fourth roll.
+
+*** Answer 7
+    As discussed in [[Answer 5]], the chance of not rolling 1 is $\frac{3}{4}$,
+    hence the chance of not rolling 1 even after eight trials is
+    $\left(\frac{3}{4}\right)^8 = \frac{6561}{65536}$.
+
+*** Answer 8
+    This is simply the chance of rolling 1 three times and rolling ``not 1''
+    five times, hence $\left(\frac{3}{4}\right)^5 \cdot
+    \left(\frac{1}{4}\right)^3 = \frac{234}{1024 \cdot 64} = \frac{243}{65536}$.
+    
+** Problem 3
+   Yoel throws a ball at ten bottles standing next to each other.  With
+   probability of 0.1 he can scatter all of the bottles.  He will miss entirely
+   with a probability 0.2.  The bottles are rearranged after each throw.
+   1. What is the chance Yoel will hit all the bottles in exactly 2 throws?
+   2. What is the chance that in two throws Yoel will hit all the bottles,
+      in three throws he will miss entirely, and the rest he will neither
+      miss, nor hit all the bottles?
+   3. What is the expected value and the variance of the number of time Yoel
+      hitting all the bottles?
+
+*** Answer 9
+    The chance of hitting all the bottles in two tries is just the sum of
+    the chance of hitting all bottles on the first and on the second tries.
+    This is so because the events are independent.  Thus the total probability
+    is $2 \cdot 0.1 = 0.2$.
+
+*** Answer 10
+    Using the polynomial distribution, the chance of hitting all the bottles
+    twice, missing three times and neither missing nor hitting all the bottles
+    is $\frac{10!}{2!3!5!} \cdot 0.2^3 \cdot (1 - 0.1 - 0.2)^{10 - 2 - 3} = 0.01
+    \cdot 0.008 \cdot 0.16807 = \num{0.33882912}$.
+
+*** Answer 11
+    Using binomial distribution formula: $E(x)=pn$, expected value is $10 \cdot
+    0.1 = 1$.  The variance is $V(x)= np(1 - p) = 1 \cdot 0.9 = 0.9$.
+
+** Problem 4
+   Yaron receives SMSs with expected value given by Poisson distribution of
+   5 messages per hour.
+   1. What is the chance that Yaron will receive 8 messages in two hours?
+   2. Yaron received 8 messages in two hours, what is the chance he received
+      only one message in the first hour?
+   3. Yaron defines an hour as ``bad'' if during that hour he received at most
+      one message.  He randomly selects hours and verifies the record of number
+      of messages received during that hour until he encounter the ``bad'' hour
+      for the first time.
+      + What is the chance he will have to look into four records?
+      + What is the expected value of ``not bad'' hours?
+
+*** Answer 12
+    Since this is Poisson distribution we assume message arrivals to be uniformly
+    distributed along the time-line, hence $\lambda = 5 \cdot 2 = 10$.  Thus, the
+    cance is calculated using $p(X = k) = e^{-\lambda} \cdot \frac{\lambda^k}{k!}$.
+    Hence $p(X) = e^{-8} \cdot \frac{10^8}{8!} = \num{0.832000565234}$.
+
+*** Answer 13
+    Similar to the question above, new $\lambda = 8 / 2 = 4$, the probability thus
+    is $p(X) = e^{-4} \cdot \frac{4^1}{1!} = \num{0.0732625555548}$.
+
+*** Answer 14
+    Since the expected value for Poisson distribution is equal to $\lambda$ (5
+    in our case), Yaron should expect to receive one message per hour with the
+    chance $p(X) = e^{-5} \cdot \frac{5^1}{1!} = \num{0.0336897349954}$.  Since
+    he looked in four records, the chance will be four times that high, i.e.
+    $\num{0.134758939982}$.
+
+*** Answer 15
+    In the previous answer we've calculated the expected value for ``bad'' hour,
+    its complement is the expectation for the ``not bad'' hour,
+    viz. $\num{0.966310265005}$.
+
+** Problem 5
+   Omri has a 0.5 chance of having a meeting in development department.  He also
+   has a 0.2 chance of managerial meeting.  While at the same time, there will
+   be no meeting at all on that day with a chance of 0.4.  Whether Omri has a
+   managerial meeting is independent of whether he has to meet the developers.
+   1. Let $X$ be the number of meetings Omri has to attend during the day,
+      find probability function $p(X)$.
+   2. What is the chance that in 2 days out of 5 Omri will have to attend no
+      meeting whatsoever?
+   3. Suppose Omri had to attend at least one meeting on each day of the week,
+      what is the chance Omri had to attend two meetings on two days during
+      the same week?
+
+*** Answer 16
+    It is expedient that we first find the probability of both meetings happening
+    on the same day.  Let the even of having a managerial meeting be $M$, and
+    the even of having a development meeting be $D$.  The even of having no
+    meeting whatsoever will be denoted by $N$, then
+    $p(M \cap D) = p(N) + p(M) + p(D) - p(\Omega) = 0.4 + 0.2 + 0.5 - 1 = 0.1$.
+    Since all probabilities must sum up to one, the probability of having exactly
+    one meeting is $1 - 0.4 - 0.1$.  Hence, the probability function is given by:
+    
+    | $x$    |   0 |   1 |   2 |
+    |--------+-----+-----+-----|
+    | $p(X)$ | 0.4 | 0.5 | 0.1 |
+
+*** Answer 17
+    The answer can be given using binomial distribution formula:
+    $X \sim B(n, p)$, where $n$ is the number of trials (5), and $k$ is the number
+    of successes (2):
+    #+HEADER: :exports results
+    #+HEADER: :results (by-backend (pdf "latex") (t "raw"))
+    #+BEGIN_SRC latex
+      \begin{eqnarray*}
+        {n \choose k} p^k (1 - p)^{n - k} &=& {5 \choose 2} 0.4^2 \cdot 0.6^3 \\
+                                         &=& 10 \cdot 0.16 \cdot 0.216 \\
+                                         &=& 0.3456\;.
+      \end{eqnarray*}
+    #+END_SRC
+
+*** Answer 18
+    A way to look at this problem could be as follows: a chance of having some
+    meetings (either one or two) is $p(M \cup D) = 0.6$.  The chance of having
+    two meetings is $p(M \cap D) = 0.1$ (as we already calculated in [[Answer 16]].
+    That is a chance of having two meetings, provided we know some meeting took
+    place is one in six.  If we try it five times, then our chances grow
+    five-fold, viz. $\frac{1}{6} \cdot 5 = \frac{5}{6}$ for one meeting, and
+    half of that for two meetings: $\frac{5}{12}$.

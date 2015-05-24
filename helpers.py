@@ -101,3 +101,34 @@ print '''
                                       chance_two_tails,
                                       chance_of_fair_two_tails,
                                       chance_third_tails])
+
+import random
+import numpy as np
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
+
+def guessing_game():
+    cards = [True] * 26 + [False] * 26
+    random.shuffle(cards)
+    reds, stop, last = 0, False, cards.pop()
+    for card in cards:
+        if stop: return not card
+        if card: reds += 1
+        else: reds = 0
+        if reds == 4: stop = True
+    return not last
+
+def waiting_game():
+    cards = [True] * 26 + [False] * 26
+    random.shuffle(cards)
+    reds, blacks, result = 0, 0, []
+    for card in cards:
+        if card: reds += 1
+        else: blacks += 1
+        if blacks > 0:
+            result.append(float(reds) / blacks)
+    return result
+
+z = np.array([max(*waiting_game()) for _ in range(10000)])
+chances = plt.hist(z, 25, facecolor='green', alpha=0.5)
+plt.show()
